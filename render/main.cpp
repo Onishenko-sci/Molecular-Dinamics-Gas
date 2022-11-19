@@ -9,7 +9,7 @@
 #include <ctime>
 #include <cstdlib>
 
-struct molecula
+struct molecula 
 {
     Vector2D position{0, 0};
     Vector2D velosity{0, 0};
@@ -55,6 +55,7 @@ int binary_search(double a)
     while(b<20)
     {
         b++;
+        
         int mid = first + (last - first) / 2;
         double mid_value = mid* correlation_dr;
         if (a <= mid_value + correlation_radius && a >= mid_value - correlation_radius)
