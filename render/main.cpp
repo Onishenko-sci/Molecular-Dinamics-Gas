@@ -52,6 +52,7 @@ int binary_search(double a)
     int first = 0;
     int last = correlation_points;
     int b = 10;
+    
     while(b<20)
     {
         b++;
