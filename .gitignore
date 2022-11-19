@@ -1,6 +1,3 @@
-.gitignore
-a.out
-.vscode
-py.ipynb
-*.txt
-/render/render
+*.out
+./.gitignore
+prerender
