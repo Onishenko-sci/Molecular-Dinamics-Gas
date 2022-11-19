@@ -2,7 +2,7 @@
 class grass
 {
 private:
-    /* data */
+    double a;
 public:
     grass(/* args */);
     ~grass();
