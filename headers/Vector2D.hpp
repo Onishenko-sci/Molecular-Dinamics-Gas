@@ -26,7 +26,7 @@ public:
     Vector2D operator+(Vector2D AddVec) { return Vector2D(x+AddVec.x,y+AddVec.y);}
     Vector2D operator-(Vector2D AddVec) { return Vector2D(x-AddVec.x,y-AddVec.y);}
     bool operator==(Vector2D Vec) { if (x == Vec.x && y == Vec.y) {return 1;} return 0;}
-    double abs() { return sqrt(x*x+y*y);}
+    double abs() const { return sqrt(x*x+y*y);}
     void abs(double len);
     double fi() { return acos(x/(this->abs()));}
 

@@ -33,11 +33,11 @@ const int steps = model_duration / delta_t;
 const int Save_every_frame = 100;
 
 const int Number_of_particles = 50;
-const double temperature =100.1;
+const double temperature =1.1;
 const double average_velosity = sqrt(3 * K_b * temperature / mol_mass);
 const double p_dencity = mol_mass*Number_of_particles/(bound_x*bound_y);
 
-const int correlation_points = 50;
+const int correlation_points = 100;
 const double correlation_dr = bound_x*sqrt(2) / correlation_points;
 const double correlation_radius = correlation_dr / 2;
 const double correlation_constanta = (4*3.1415*p_dencity*Number_of_particles);

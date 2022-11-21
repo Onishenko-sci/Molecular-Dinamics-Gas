@@ -8,9 +8,9 @@ int main()
     Argon.pit_debt = 1.66 * pow(10, -21);
     Argon.interaction_radius = 2.5*Argon.radius;
 
-    molecular_dinamics gas(Argon,100);
-    gas.set_temperature(100.0);
-    gas.simulate(1e+6,1e-13);
+    molecular_dinamics gas(Argon,50);
+    gas.set_temperature(1.0);
+    gas.simulate(1e+5,1e-13);
     
     return 0;
 }
