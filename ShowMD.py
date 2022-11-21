@@ -23,7 +23,7 @@ bound_x = 0
 bound_y = 0
 cor_points = 0
 
-mashtab = 10000000000-0.1*10000000000
+mashtab = 2*(10000000000-0.1*10000000000)
 
 
 
@@ -40,11 +40,11 @@ with open(filename, newline='\n' ) as f:
             bound_y = float(row[1])
             N = int(row[2])
             radius = float(row[3])
-            T = float(row[4])
+            steps = int(row[4])
             delta_t = float(row[5])
             save_every_frame = int(row[6])
             cor_points = int(row[7])
-            frames = int((T/delta_t)/save_every_frame)
+            frames = int(steps/save_every_frame)
             frame_x = np.zeros(int(N*(frames+1))).reshape(N,int(frames+1))
             frame_y = np.zeros(int(N*(frames+1))).reshape(N,int(frames+1))
             
@@ -52,7 +52,7 @@ with open(filename, newline='\n' ) as f:
             current_t = np.zeros(int(frames+1))
             potential_e = np.zeros(int(frames+1))
             cinetic_e = np.zeros(int(frames+1))
-            sqared_displacment = np.zeros(int(frames+1)-1)
+            sqared_displacment = np.zeros(int(frames))
             corl_x = np.zeros(100)
             corl = np.zeros(100)
             head_readed = True
@@ -88,6 +88,8 @@ full_e = cinetic_e+potential_e
 traked = 1
 tragectory_x = frame_x[traked,:]*mashtab
 tragectory_y = frame_y[traked,:]*mashtab
+
+print(sqared_displacment)
 
 plt.figure(figsize=(13,5), dpi=120)
 plt.subplot(1,2,1)

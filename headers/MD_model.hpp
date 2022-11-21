@@ -39,6 +39,7 @@ private:
     void write_header(std::ostream& file,int steps,double delta_t);
     void write_mol_info(std::ostream& file, int i);
     void write_step_info(std::ostream& file,int step);
+    void write_correlation_data(std::ostream& file,int steps);
 
     double Temperature;
     double Potential;
@@ -51,7 +52,7 @@ private:
 public:
     molecular_dinamics(molecule& molecul, int number_of_particles, int bound_x = 100,int bound_y = 100);
     void set_temperature(double temperatur);
-    void simulate(int steps,double delta_t, std::string filename = "../prerender/md_render.txt");
+    void simulate(int steps,double delta_t, std::string filename = "./prerender/md_render.txt");
     ~molecular_dinamics();
 };
 
