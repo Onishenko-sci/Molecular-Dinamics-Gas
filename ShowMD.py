@@ -23,7 +23,6 @@ bound_x = 0
 bound_y = 0
 cor_points = 0
 
-mashtab = 2*(10000000000-0.1*10000000000)
 
 
 
@@ -53,8 +52,8 @@ with open(filename, newline='\n' ) as f:
             potential_e = np.zeros(int(frames+1))
             cinetic_e = np.zeros(int(frames+1))
             sqared_displacment = np.zeros(int(frames))
-            corl_x = np.zeros(100)
-            corl = np.zeros(100)
+            corl_x = np.zeros(int(row[7]))
+            corl = np.zeros(int(row[7]))
             head_readed = True
             continue
 
@@ -85,16 +84,19 @@ with open(filename, newline='\n' ) as f:
 
 full_e = cinetic_e+potential_e
 
+mashtab = 800/bound_x
+
 traked = 1
 tragectory_x = frame_x[traked,:]*mashtab
 tragectory_y = frame_y[traked,:]*mashtab
 
-print(sqared_displacment)
-
 plt.figure(figsize=(13,5), dpi=120)
 plt.subplot(1,2,1)
 plt.title('Correlation function')
-plt.plot(corl_x,corl,'b.')
+plt.plot(corl_x[:80],corl[:80],'b.')
+#plt.plot(np.ones(3)*radius,np.linspace(0,1e-1,3),'r--')
+#plt.plot(np.ones(3)*bound_x,np.linspace(0,np.amax(corl),3),'g--')
+
 plt.subplot(1,2,2)
 plt.title('Squared displacment')
 plt.plot(np.arange(0,sqared_displacment.__len__())*delta_t,sqared_displacment[:] , "b-")

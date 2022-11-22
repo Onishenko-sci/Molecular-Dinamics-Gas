@@ -9,6 +9,8 @@ molecular_dinamics::molecular_dinamics(molecule &molecul, int number_of_particle
     start_posistions = new Vector2D[number_of_particles];
     displacement = new Vector2D[number_of_particles];
     previous_step_acceleration = new Vector2D[number_of_particles];
+    correlation_points = 500;
+    Correlation = new double[correlation_points];
     Number_of_particles = number_of_particles;
     mol = molecul;
     Bound_x = mol.radius * bound_x;
@@ -46,7 +48,7 @@ void molecular_dinamics::set_start_position()
             random_position.y = random_y(rd);
             for (int j = 0; j < i; j++)
             {
-                if ((particles[j].position - random_position).abs() < mol.radius)
+                if ((particles[j].position - random_position).abs() < mol.interaction_radius)
                     far_enough = false;
             }
             if (far_enough)
@@ -95,7 +97,7 @@ Vector2D molecular_dinamics::radius_vec(int &i, int &j) const
 
 bool molecular_dinamics::save_in_correlation(const double &dist)
 {
-    static const double correlation_radius = Bound_x / (2 * 100);
+    static const double correlation_radius = Bound_x / (2 * correlation_points);
     int first = 0;
     int last = Bound_x / (2 * correlation_radius);
     for (int c = 0; c < 10; ++c)
@@ -125,7 +127,6 @@ void molecular_dinamics::LJ_interact(int &i, int &j, const Vector2D &radius_vec)
     double PotentialLJ;
     Vector2D force;
     double distance = radius_vec.abs();
-    save_in_correlation(distance);
     if (distance < mol.interaction_radius)
     {
         PotentialLJ = (e4sig12 / pow(distance, 12)) - (e4sig6 / pow(distance, 6)) - shift;
@@ -160,7 +161,7 @@ void molecular_dinamics::write_header(std::ostream &file, int steps, double delt
          << steps << ";"
          << delta_t << ';'
          << "25" << ';' // save every frame
-         << "100"
+         << correlation_points
          << "\n"; // correlation points
 }
 
@@ -185,12 +186,20 @@ void molecular_dinamics::write_step_info(std::ostream &file, int current_step)
 
 void molecular_dinamics::write_correlation_data(std::ostream &file, int steps)
 {
+    for (int i = 0; i < Number_of_particles - 1; i++)
+    {
+        for (int j = i + 1; j < Number_of_particles; j++)
+        {
+            double distance = (particles[j].position - particles[i].position).abs();
+            save_in_correlation(distance);
+        }
+    }
     file << "1488;" << std::endl;
     const double p_dencity = mol.mass * Number_of_particles / (Bound_x * Bound_y);
     const double correlation_constanta = (4 * 3.1415 * p_dencity * Number_of_particles);
-    for (int i = 0; i < 100; i++)
-        file << i * Bound_x / 100 << ';'
-             << (Correlation[i] / steps) /* / (correlation_constanta * pow(i * Bound_x / 100, 2)*/ << ';'
+    for (int i = 0; i < correlation_points; i++)
+        file << i * Bound_x / correlation_points << ';'
+             << (Correlation[i]*Bound_x*Bound_y )/((Number_of_particles-1) * pow(Number_of_particles, 2)) << ';'
              << std::endl;
 }
 
@@ -245,6 +254,7 @@ void molecular_dinamics::simulate(int steps, double delta_t, std::string filenam
             Temperature = (Kin_Energy * 2) / (3 * K_b * Number_of_particles);
             write_step_info(File, step);
         }
+        
     }
 
     write_correlation_data(File, steps);

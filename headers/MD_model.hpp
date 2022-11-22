@@ -47,7 +47,8 @@ private:
     double Square_displacment;
     Vector2D* start_posistions;
     Vector2D* displacement;
-    double Correlation[100];
+    double* Correlation;
+    int correlation_points;
 
 public:
     molecular_dinamics(molecule& molecul, int number_of_particles, int bound_x = 100,int bound_y = 100);
