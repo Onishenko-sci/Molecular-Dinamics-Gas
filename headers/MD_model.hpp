@@ -34,9 +34,9 @@ private:
     Vector2D radius_vec(int& i,int& j) const;
     void LJ_interact(int& i,int& j,const Vector2D& vector_between);
     void boundaries_check(int i);
-    bool save_in_correlation(const double& distance);
+    void save_in_correlation();
     void obs_calc();
-    void write_header(std::ostream& file,int steps,double delta_t);
+    void write_header(std::ostream& file,int steps,double delta_t, int save_every_frame);
     void write_mol_info(std::ostream& file, int i);
     void write_step_info(std::ostream& file,int step);
     void write_correlation_data(std::ostream& file,int steps);
@@ -47,13 +47,15 @@ private:
     double Square_displacment;
     Vector2D* start_posistions;
     Vector2D* displacement;
+
     double* Correlation;
     int correlation_points;
+    double correlation_dr;
 
 public:
     molecular_dinamics(molecule& molecul, int number_of_particles, int bound_x = 100,int bound_y = 100);
     void set_temperature(double temperatur);
-    void simulate(int steps,double delta_t, std::string filename = "./prerender/md_render.txt");
+    void simulate(int steps,double delta_t, int save_every_frame = 50, std::string filename = "./prerender/md_render.txt");
     ~molecular_dinamics();
 };
 

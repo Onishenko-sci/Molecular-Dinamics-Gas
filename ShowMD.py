@@ -93,9 +93,9 @@ tragectory_y = frame_y[traked,:]*mashtab
 plt.figure(figsize=(13,5), dpi=120)
 plt.subplot(1,2,1)
 plt.title('Correlation function')
-plt.plot(corl_x[:80],corl[:80],'b.')
+plt.plot(corl_x,corl,'b.')
 #plt.plot(np.ones(3)*radius,np.linspace(0,1e-1,3),'r--')
-#plt.plot(np.ones(3)*bound_x,np.linspace(0,np.amax(corl),3),'g--')
+plt.plot(np.ones(3)*bound_x/2,np.linspace(0,np.amax(corl),3),'g--')
 
 plt.subplot(1,2,2)
 plt.title('Squared displacment')
