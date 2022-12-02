@@ -101,42 +101,40 @@ plt.subplot(1,2,2)
 plt.title('Squared displacment')
 plt.plot(np.arange(0,sqared_displacment.__len__())*delta_t,sqared_displacment[:] , "b-")
 
-plt.show()
 
 root = Tk()
-c = Canvas(root,width=int(bound_x*mashtab+400),heigh=int(bound_y*mashtab+20))
+c = Canvas(root,width=int(bound_x*mashtab+400),heigh=int(bound_y*mashtab+20), bg="#38444c") 
 c.pack()
 
 for k in range(int(frames)):
     fr = k
-    c.create_oval(tragectory_x[fr]-2,tragectory_y[fr]-2, tragectory_x[fr]+2,tragectory_y[fr]+2, width=0, fill="red")
+    c.create_oval(tragectory_x[fr]-2,tragectory_y[fr]-2, tragectory_x[fr]+2,tragectory_y[fr]+2, width=0, fill="#ba0e37")
 
-c.create_line(bound_x*mashtab,0,bound_x*mashtab,bound_y*mashtab+20,width=5)
-c.create_line(bound_x*mashtab,bound_y*mashtab,0,bound_y*mashtab,width=5)
-c.create_text(bound_x*mashtab+5,155, text=("Particles: " + str(N)), fill="black", anchor="nw", font=('Helvetica 15 bold'))
+c.create_line(bound_x*mashtab,0,bound_x*mashtab,bound_y*mashtab+20,width=5,fill="white")
+c.create_line(bound_x*mashtab,bound_y*mashtab,0,bound_y*mashtab,width=5,fill="white")
+c.create_text(bound_x*mashtab+5,155, text=("Particles: " + str(N)), fill="white", anchor="nw", font=('Helvetica 15 bold'))
 
 for i in range(frames):
     c.delete("del")
-    c.create_text(bound_x*mashtab+5,5, text=("Time: " + str(current_frame[i]) + '*' +  str(delta_t)),
-     fill="black", anchor="nw", font=('Helvetica 15 bold'), tags="del")
-    c.create_text(bound_x*mashtab+5,35, text=("Temperature: " + str(current_t[i])), fill="black", anchor="nw", font=('Helvetica 15 bold'), tags="del")
-    c.create_text(bound_x*mashtab+5,65, text=("Cinetic Energy: " + str(cinetic_e[i])), fill="black", anchor="nw", font=('Helvetica 15 bold'), tags="del")
-    c.create_text(bound_x*mashtab+5,95, text=("Potencial Energy: " + str(potential_e[i])), fill="black", anchor="nw", font=('Helvetica 15 bold'), tags="del")
-    c.create_text(bound_x*mashtab+5,125, text=("Suadred displacment: " + str(sqared_displacment[i])), fill="black", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+    c.create_text(bound_x*mashtab+5,5,   text=("Time: " + str(current_frame[i]) + '*' +  str(delta_t)), fill="white", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+    c.create_text(bound_x*mashtab+5,35,  text=("Temperature: " + str(current_t[i])), fill="white", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+    c.create_text(bound_x*mashtab+5,65,  text=("Kinetic Energy: " + str(cinetic_e[i])), fill="white", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+    c.create_text(bound_x*mashtab+5,95,  text=("Potential Energy: " + str(potential_e[i])), fill="white", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+    c.create_text(bound_x*mashtab+5,125, text=("Squared displacement: " + str(sqared_displacment[i])), fill="white", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+
     c.create_line(0,bound_y*mashtab+15,(int(i/(frames/1000))/1000)*bound_x*mashtab,bound_y*mashtab+15,width=20, fill="green", tags="del")
 
 
 
     for j in range(N):
         if j==traked:
-            c.create_oval((frame_x[j,i]-radius)*mashtab,(frame_y[j,i]-radius)*mashtab,(frame_x[j,i]+radius)*mashtab,(frame_y[j,i]+radius)*mashtab, fill='white', tags="del")
+            c.create_oval((frame_x[j,i]-radius)*mashtab,(frame_y[j,i]-radius)*mashtab,(frame_x[j,i]+radius)*mashtab,(frame_y[j,i]+radius)*mashtab, fill='blue', tags="del")
         else:
-            c.create_oval((frame_x[j,i]-radius)*mashtab,(frame_y[j,i]-radius)*mashtab,(frame_x[j,i]+radius)*mashtab,(frame_y[j,i]+radius)*mashtab, fill='black', tags="del")
+            c.create_oval((frame_x[j,i]-radius)*mashtab,(frame_y[j,i]-radius)*mashtab,(frame_x[j,i]+radius)*mashtab,(frame_y[j,i]+radius)*mashtab, fill='red', tags="del")
        # c.create_oval((frame_x[j,i]-4*radius)*mashtab,(frame_y[j,i]-4*radius)*mashtab,(frame_x[j,i]+4*radius)*mashtab,(frame_y[j,i]+4*radius)*mashtab)
 
     root.update()
     #sleep(delta_t*mashtab)
-    sleep(0.005)
     
     if (i%(frames/100) == 0):
         print(int(i/(frames/100)), '%')
@@ -147,4 +145,5 @@ for i in range(frames):
 
 root.mainloop()
 
+#plt.show()
 
