@@ -12,7 +12,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         filename = './' + sys.argv[1]
     else:
-        filename = './prerender/md_render.txt'
+        filename = '../render/md_render.txt'
 
 N = 100
 radius = 0.0
