@@ -2,7 +2,6 @@
 #include "../headers/MD_model.hpp"
 #include <random>
 #include <iostream>
-#include <omp.h>
 
 molecular_dinamics::molecular_dinamics(molecule &molecul, int number_of_particles, int bound_x, int bound_y)
 {
@@ -69,8 +68,7 @@ void molecular_dinamics::simulate(int steps, double delta_t, int save_every_fram
         {
             for (int j = i + 1; j < Number_of_particles; j++)
                 LJ_interact(i, j, radius_vec(i, j));
-            particles[i].velosity = particles[i].velosity +
-                                    ((particles[i].acceleration + previous_step_acceleration[i]) / 2) * delta_t;
+            particles[i].velosity = particles[i].velosity +((particles[i].acceleration + previous_step_acceleration[i]) / 2) * delta_t;
             displacement[i] = displacement[i] + particles[i].velosity * delta_t;
         }
 

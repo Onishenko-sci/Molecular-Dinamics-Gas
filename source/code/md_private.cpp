@@ -2,7 +2,6 @@
 #include "../headers/MD_model.hpp"
 #include <random>
 #include <iostream>
-#include <omp.h>
 
 void molecular_dinamics::reset_acceleration(int i)
 {
@@ -133,14 +132,13 @@ void molecular_dinamics::write_step_info(std::ostream &file, int current_step)
 
 void molecular_dinamics::write_correlation_data(std::ostream &file, int steps)
 {
-    file << "1488;" << std::endl;
+    file << "101; Correlation data section" << std::endl;
     const double p_dencity = mol.mass * Number_of_particles / (Bound_x * Bound_y);
     const double correlation_constanta = (4 * 3.1415 * p_dencity * Number_of_particles);
     const double normalization = (steps / 2) * (Number_of_particles - 1) * Number_of_particles / 2;
     for (int i = 1; i < correlation_points; i++)
         file
             << i * correlation_dr << ';'
-            //   << Correlation[i] / normalization << ';'
             << Correlation[i] / (normalization * correlation_constanta * pow(i * correlation_dr, 2)) << ';'
             << std::endl;
 }

@@ -1,5 +1,3 @@
-
-from telnetlib import theNULL
 from time import sleep
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,26 +12,14 @@ if __name__ == "__main__":
     else:
         filename = '../render/md_render.txt'
 
-N = 100
-radius = 0.0
-T = 0.0
-delta_t = 1.0
-frames = T/delta_t
-bound_x = 0
-bound_y = 0
-cor_points = 0
-
-
-
-
-
 i=0
 j=0
 head_readed = False
-read_corl = False
+read_corelation_data = False
 with open(filename, newline='\n' ) as f:
     reader = csv.reader(f,delimiter = ';')
     for row in reader:
+
         if (head_readed == False):
             bound_x = float(row[0])
             bound_y = float(row[1])
@@ -57,7 +43,7 @@ with open(filename, newline='\n' ) as f:
             head_readed = True
             continue
 
-        if ((i == N) and (not read_corl)):
+        if ((i == N) and (not read_corelation_data)):
           current_frame[j] = float(row[1])
           cinetic_e[j] = float(row[2])
           potential_e[j] = float(row[3])
@@ -67,12 +53,12 @@ with open(filename, newline='\n' ) as f:
           j=j+1
           continue
 
-        if (float(row[0]) >= 1487.0):
-            read_corl = True
+        if (float(row[0]) == 101):
+            read_corelation_data = True
             i=0
             continue
 
-        if (read_corl):
+        if (read_corelation_data):
             corl_x[i]=float(row[0])
             corl[i] = float(row[1])
             i=i+1
@@ -82,20 +68,16 @@ with open(filename, newline='\n' ) as f:
         frame_y[i,j] = float(row[1])
         i=i+1
 
-full_e = cinetic_e+potential_e
-
 mashtab = 800/bound_x
 
-traked = 1
+traked = 1 #Number of tracked atom
 tragectory_x = frame_x[traked,:]*mashtab
 tragectory_y = frame_y[traked,:]*mashtab
 
-plt.figure(figsize=(13,5), dpi=120)
+plt.figure(figsize=(10,4), dpi=120)
 plt.subplot(1,2,1)
 plt.title('Correlation function')
 plt.plot(corl_x,corl,'b.')
-#plt.plot(np.ones(3)*radius,np.linspace(0,1e-1,3),'r--')
-plt.plot(np.ones(3)*bound_x/2,np.linspace(0,np.amax(corl),3),'g--')
 
 plt.subplot(1,2,2)
 plt.title('Squared displacment')
@@ -133,10 +115,10 @@ for i in range(frames):
 
     for j in range(N):
         if j==traked:
-            c.create_oval((frame_x[j,i]-radius)*mashtab,
-                          (frame_y[j,i]-radius)*mashtab,
-                          (frame_x[j,i]+radius)*mashtab,
-                          (frame_y[j,i]+radius)*mashtab, 
+            c.create_oval(scene_x + (frame_x[j,i]-radius)*mashtab,
+                          scene_y + (frame_y[j,i]-radius)*mashtab,
+                          scene_x + (frame_x[j,i]+radius)*mashtab,
+                          scene_y + (frame_y[j,i]+radius)*mashtab, 
                           fill='#FB0000', tags="del", activefill="blue",outline="#FB0000")
         else:
             c.create_oval(scene_x + (frame_x[j,i]-radius)*mashtab,
@@ -144,7 +126,6 @@ for i in range(frames):
                           scene_x + (frame_x[j,i]+radius)*mashtab,
                           scene_y + (frame_y[j,i]+radius)*mashtab,
                           fill="#6BAABF", tags="del", outline="#6BAABF")
-       # c.create_oval((frame_x[j,i]-4*radius)*mashtab,(frame_y[j,i]-4*radius)*mashtab,(frame_x[j,i]+4*radius)*mashtab,(frame_y[j,i]+4*radius)*mashtab)
 
     root.update()
     #sleep(0.001)
@@ -154,7 +135,7 @@ for i in range(frames):
         if (int(i/(frames/100)) == 99):
             print("Done!")
             root.quit()
-           # root.destroy()
+
 
 root.mainloop()
 
