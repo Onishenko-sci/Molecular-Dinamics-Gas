@@ -70,7 +70,7 @@ with open(filename, newline='\n' ) as f:
 
 mashtab = 800/bound_x
 
-traked = 1 #Number of tracked atom
+traked = N-1 #Number of tracked atom
 tragectory_x = frame_x[traked,:]*mashtab
 tragectory_y = frame_y[traked,:]*mashtab
 
@@ -79,7 +79,7 @@ plt.subplot(1,2,1)
 plt.title('Correlation function')
 plt.xlabel('Distance between particles, meters')
 plt.plot(corl_x,corl,'b.')
-#plt.plot(np.array([0,radius*bound_x]),np.linspace(0,corl.max(),2),'g--')
+plt.plot(np.array([2*radius,2*radius]),np.linspace(0,corl.max(),2),'g--')
 
 plt.subplot(1,2,2)
 plt.title('Mean squared displacement')
@@ -113,7 +113,7 @@ for i in range(frames):
     c.create_text(bound_x*mashtab+10,95,  text=("Potential Energy: " + str(potential_e[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
     c.create_text(bound_x*mashtab+10,125, text=("Mean squared displacement: " + str(sqared_displacment[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
 
-    c.create_line(0,bound_y*mashtab+25,(int(i/(frames/1000))/1000)*(bound_x*mashtab+400),bound_y*mashtab+25,width=10, fill="#6BAABF", tags="del")
+    c.create_line(0,bound_y*mashtab+25,(int(i/(frames/1000))/1000)*(bound_x*mashtab+500),bound_y*mashtab+25,width=10, fill="#6BAABF", tags="del")
 
 
 
