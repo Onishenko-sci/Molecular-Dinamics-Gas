@@ -37,9 +37,9 @@ private:
     void LJ_interact(int& i,int& j);
     void boundaries_check(int i);
     
-    void write_header(int save_every_frame);
+    void write_header(int frame_rate);
     void write_mol_info(int molecule_i);
-    void write_step_info(int current_step);
+    void write_observables(int current_step);
     void write_correlation_data();
 
     double Temperature;
@@ -52,6 +52,7 @@ private:
     double* Correlation;
     int correlation_points;
     double correlation_dr;
+    double correlation_max_r;
     void save_in_correlation();
 
     std::ofstream File;
@@ -61,7 +62,7 @@ private:
 public:
     molecular_dinamics(molecule& molecul, int number_of_particles, int bound_x = 100,int bound_y = 100);
     void set_temperature(double temperatur);
-    void simulate(int steps,double delta_t, std::string filename = "../render/md_render.txt", int save_every_frame = 50);
+    void simulate(int steps,double delta_t, std::string filename = "../render/md_render.txt", int frame_rate = 50);
     ~molecular_dinamics();
 
 };

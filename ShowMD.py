@@ -69,6 +69,7 @@ with open(filename, newline='\n' ) as f:
         i=i+1
 
 mashtab = 800/bound_x
+radius = radius/2
 
 traked = N-1 #Number of tracked atom
 tragectory_x = frame_x[traked,:]*mashtab
@@ -77,9 +78,9 @@ tragectory_y = frame_y[traked,:]*mashtab
 plt.figure(figsize=(10,4), dpi=120)
 plt.subplot(1,2,1)
 plt.title('Correlation function')
-plt.xlabel('Distance between particles, meters')
-plt.plot(corl_x,corl,'b.')
-plt.plot(np.array([2*radius,2*radius]),np.linspace(0,corl.max(),2),'g--')
+plt.xlabel('Distance between particles, Angstrom')
+plt.plot(corl_x*(10**10),corl,'b.')
+plt.plot(np.array([2*radius,2*radius])*(10**10),np.linspace(0,corl.max(),2),'g--')
 
 plt.subplot(1,2,2)
 plt.title('Mean squared displacement')
