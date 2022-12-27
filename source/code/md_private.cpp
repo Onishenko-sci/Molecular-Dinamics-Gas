@@ -36,7 +36,7 @@ void molecular_dinamics::set_start_position()
     }
 }
 
-Vector2D molecular_dinamics::radius_vec(int &i, int &j) const
+Vector2D molecular_dinamics::radius_vector(int &i, int &j) const
 {
     Vector2D nearest_copy = particles[j].position;
     Vector2D delta_position = particles[j].position - particles[i].position;
@@ -56,22 +56,23 @@ Vector2D molecular_dinamics::radius_vec(int &i, int &j) const
 
 void molecular_dinamics::save_in_correlation()
 {
-    for (int i = 0; i < Number_of_particles - 1; i++)
+    for (int i = 0; i <= Number_of_particles - 1; i++)
         for (int j = i + 1; j < Number_of_particles; j++)
         {
-            double distance = radius_vec(i, j).abs();
-            if (distance < Bound_x / 2)
+            double distance = radius_vector(i, j).abs();
+            if (distance < mol.radius * 5)
                 Correlation[int(distance / correlation_dr)] += 2;
         }
 }
 
-void molecular_dinamics::LJ_interact(int &i, int &j, const Vector2D &radius_vec)
+void molecular_dinamics::LJ_interact(int &i, int &j)
 {
     static const double e4sig6 = 4 * mol.pit_debt * pow(mol.radius, 6);
     static const double e4sig12 = 4 * mol.pit_debt * pow(mol.radius, 12);
     static const double shift = (e4sig12 / pow(mol.interaction_radius, 12)) - (e4sig6 / pow(mol.interaction_radius, 6));
-    double PotentialLJ;
+    Vector2D radius_vec = radius_vector(i, j);
     Vector2D force;
+    double PotentialLJ;
     double distance = radius_vec.abs();
     if (distance < mol.interaction_radius)
     {
@@ -80,8 +81,8 @@ void molecular_dinamics::LJ_interact(int &i, int &j, const Vector2D &radius_vec)
         particles[j].potential = particles[j].potential + PotentialLJ;
 
         force = 12 * ((e4sig12 / pow(distance, 14)) - (0.5 * e4sig6 / pow(distance, 8))) * radius_vec;
-        particles[i].acceleration = particles[i].acceleration + force / mol.mass;
-        particles[j].acceleration = particles[j].acceleration - force / mol.mass;
+        particles[i].acceleration = particles[i].acceleration - force / mol.mass;
+        particles[j].acceleration = particles[j].acceleration + force / mol.mass;
     }
 }
 
@@ -98,31 +99,31 @@ void molecular_dinamics::boundaries_check(int i)
         particles[i].position.Y(Bound_y);
 }
 
-void molecular_dinamics::write_header(std::ostream &file, int steps, double delta_t, int save_every_frame)
+void molecular_dinamics::write_header(int save_every_frame)
 {
-    file << Bound_x << ";"
+    File << Bound_x << ";"
          << Bound_y << ";"
          << Number_of_particles << ";"
-         << mol.radius << ";"
-         << steps << ";"
-         << delta_t << ';'
+         << mol.radius / 2 << ";"
+         << number_of_steps << ";"
+         << time_step << ';'
          << save_every_frame << ';' // save every frame
          << correlation_points
          << "\n"; // correlation points
 }
 
-void molecular_dinamics::write_mol_info(std::ostream &file, int i)
+void molecular_dinamics::write_mol_info(int i)
 {
-    file << particles[i].position.x << ";"
+    File << particles[i].position.x << ";"
          << particles[i].position.y << ";"
          << particles[i].potential << ";"
          << particles[i].velosity.abs() << ";"
-         << particles[i].acceleration.abs() << "\n";
+         << particles[i].acceleration.x << "\n";
 }
 
-void molecular_dinamics::write_step_info(std::ostream &file, int current_step)
+void molecular_dinamics::write_step_info(int current_step)
 {
-    file << "///----End----///;"
+    File << "///----End----///;"
          << current_step << ";"
          << Kin_Energy << ';'
          << Potential << ';'
@@ -130,16 +131,13 @@ void molecular_dinamics::write_step_info(std::ostream &file, int current_step)
          << Temperature << ';' << std::endl;
 }
 
-void molecular_dinamics::write_correlation_data(std::ostream &file, int steps)
+void molecular_dinamics::write_correlation_data()
 {
-    file << "101; Correlation data section" << std::endl;
-    const double p_dencity = mol.mass * Number_of_particles / (Bound_x * Bound_y);
-    const double correlation_constanta = (4 * 3.1415 * p_dencity * Number_of_particles);
-    const double normalization = (steps / 2) * (Number_of_particles - 1) * Number_of_particles / 2;
+    File << "101; Correlation data section" << std::endl;
+    const double volume = Bound_x * Bound_y;
+    const double normalization = (number_of_steps / 2) * (Number_of_particles - 1) * Number_of_particles;
     for (int i = 1; i < correlation_points; i++)
-        file
-            << i * correlation_dr << ';'
-            << Correlation[i] / (normalization * correlation_constanta * pow(i * correlation_dr, 2)) << ';'
-            << std::endl;
+        File << i * correlation_dr << ';'
+             << ((volume / normalization) * Correlation[i]) / (3.1415 * (pow(i * correlation_dr + correlation_dr, 2) - pow(i * correlation_dr, 2))) << ';'
+             << std::endl;
 }
-

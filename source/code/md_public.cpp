@@ -15,10 +15,10 @@ molecular_dinamics::molecular_dinamics(molecule &molecul, int number_of_particle
     mol = molecul;
     Bound_x = mol.radius * bound_x;
     Bound_y = mol.radius * bound_y;
-    correlation_dr = (Bound_x / 2) / correlation_points;
+    correlation_dr = (mol.radius * 5) / correlation_points;
     set_start_position();
 }
- 
+
 molecular_dinamics::~molecular_dinamics()
 {
     delete[] particles;
@@ -46,14 +46,21 @@ void molecular_dinamics::set_temperature(double temperatur)
     }
 }
 
-void molecular_dinamics::simulate(int steps, double delta_t, int save_every_frame, std::string filename)
+void molecular_dinamics::simulate(int steps, double delta_t, std::string filename, int save_every_frame)
 {
-    std::ofstream File(filename);
+    File.open(filename);
+    number_of_steps = steps;
+    time_step = delta_t;
 
-    write_header(File, steps, delta_t, save_every_frame);
+    write_header(save_every_frame);
 
     for (int step = 0; step < steps; step++)
     {
+        if (Temperature > 200 || std::isnan(Temperature))
+        {
+            std::cout << "Shit happend!\n";
+        }
+
         if (step % (steps / 100) == 0)
             std::cout << "-" << std::flush;
 
@@ -64,15 +71,15 @@ void molecular_dinamics::simulate(int steps, double delta_t, int save_every_fram
             reset_acceleration(i);
         }
 
-        for (int i = 0; i < Number_of_particles - 1; i++)
+        for (int i = 0; i <= Number_of_particles - 1; i++)
         {
             for (int j = i + 1; j < Number_of_particles; j++)
-                LJ_interact(i, j, radius_vec(i, j));
-            particles[i].velosity = particles[i].velosity +((particles[i].acceleration + previous_step_acceleration[i]) / 2) * delta_t;
+                LJ_interact(i, j);
+            particles[i].velosity = particles[i].velosity + ((particles[i].acceleration + previous_step_acceleration[i]) / 2) * delta_t;
             displacement[i] = displacement[i] + particles[i].velosity * delta_t;
         }
 
-        if (step >= steps / 2)
+        if (step > steps / 2)
             save_in_correlation();
 
         if (step % save_every_frame == 0)
@@ -85,15 +92,15 @@ void molecular_dinamics::simulate(int steps, double delta_t, int save_every_fram
                 Kin_Energy += mol.mass * pow(particles[i].velosity.abs(), 2) / 2;
                 Potential += particles[i].potential;
                 Square_displacment += pow((displacement[i] - start_posistions[i]).abs(), 2);
-                write_mol_info(File, i);
+                write_mol_info(i);
             }
             Temperature = (Kin_Energy * 2) / (3 * K_b * Number_of_particles);
-            write_step_info(File, step);
+            write_step_info(step);
         }
     }
 
-    write_correlation_data(File, steps);
+    write_correlation_data();
 
     File.close();
-    std::cout << "\n Done! \n";
+    std::cout << "\nDone! \n";
 }

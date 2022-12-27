@@ -7,7 +7,7 @@ struct molecule
     double mass;
     double radius;
     double pit_debt;
-    double interaction_radius = 2.5*radius;
+    double interaction_radius;
 };
 
 struct particle
@@ -30,16 +30,17 @@ private:
     double Bound_x;
     double Bound_y;
 
+
     void set_start_position();
     void reset_acceleration(int i);
-    Vector2D radius_vec(int& i,int& j) const;
-    void LJ_interact(int& i,int& j,const Vector2D& vector_between);
+    Vector2D radius_vector(int& i,int& j) const;
+    void LJ_interact(int& i,int& j);
     void boundaries_check(int i);
     
-    void write_header(std::ostream& file,int steps,double delta_t, int save_every_frame);
-    void write_mol_info(std::ostream& file, int i);
-    void write_step_info(std::ostream& file,int step);
-    void write_correlation_data(std::ostream& file,int steps);
+    void write_header(int save_every_frame);
+    void write_mol_info(int molecule_i);
+    void write_step_info(int current_step);
+    void write_correlation_data();
 
     double Temperature;
     double Potential;
@@ -53,10 +54,15 @@ private:
     double correlation_dr;
     void save_in_correlation();
 
+    std::ofstream File;
+    int number_of_steps;
+    double time_step;
+
 public:
     molecular_dinamics(molecule& molecul, int number_of_particles, int bound_x = 100,int bound_y = 100);
     void set_temperature(double temperatur);
-    void simulate(int steps,double delta_t, int save_every_frame = 50, std::string filename = "../render/md_render.txt");
+    void simulate(int steps,double delta_t, std::string filename = "../render/md_render.txt", int save_every_frame = 50);
     ~molecular_dinamics();
+
 };
 
