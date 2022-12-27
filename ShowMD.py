@@ -27,14 +27,14 @@ with open(filename, newline='\n' ) as f:
             radius = float(row[3])
             steps = int(row[4])
             delta_t = float(row[5])
-            save_every_frame = int(row[6])
+            frame_rate = int(row[6])
             cor_points = int(row[7])
-            frames = int(steps/save_every_frame)
+            frames = int(steps/frame_rate)
             frame_x = np.zeros(int(N*(frames+1))).reshape(N,int(frames+1))
             frame_y = np.zeros(int(N*(frames+1))).reshape(N,int(frames+1))
             
             current_frame = np.zeros(int(frames+1))
-            current_t = np.zeros(int(frames+1))
+            current_t = np.zeros(int(frames))
             potential_e = np.zeros(int(frames+1))
             cinetic_e = np.zeros(int(frames+1))
             sqared_displacment = np.zeros(int(frames))
@@ -78,6 +78,7 @@ tragectory_y = frame_y[traked,:]*mashtab
 plt.figure(figsize=(10,4), dpi=120)
 plt.subplot(1,2,1)
 plt.title('Correlation function')
+plt.ylabel('Correlation function')
 plt.xlabel('Distance between particles, Angstrom')
 plt.plot(corl_x*(10**10),corl,'b.')
 plt.plot(np.array([2*radius,2*radius])*(10**10),np.linspace(0,corl.max(),2),'g--')
@@ -85,8 +86,12 @@ plt.plot(np.array([2*radius,2*radius])*(10**10),np.linspace(0,corl.max(),2),'g--
 plt.subplot(1,2,2)
 plt.title('Mean squared displacement')
 plt.ylabel('Mean squared displacement, meters')
-plt.xlabel('Time, sec')
-plt.plot(np.arange(0,sqared_displacment.__len__())*delta_t,sqared_displacment[:] , "b-")
+plt.xlabel('Steps')
+plt.plot(np.arange(0,sqared_displacment.__len__())*frame_rate,sqared_displacment[:] , "b-")
+
+plt.show()
+
+plt.plot(np.arange(0,current_t.__len__()), current_t, 'b-')
 plt.show()
 
 scene_x = 5
@@ -104,7 +109,8 @@ c.create_line(bound_x*mashtab+5,5,bound_x*mashtab+5,bound_y*mashtab+5,width=5,fi
 c.create_line(bound_x*mashtab+5,bound_y*mashtab+5,5,bound_y*mashtab+5,width=5,fill="#BDD4F1")
 c.create_line(5,5,5,bound_y*mashtab+5,width=5,fill="#BDD4F1")
 c.create_line(5,5,bound_x*mashtab+5,5,width=5,fill="#BDD4F1")
-c.create_text(bound_x*mashtab+10,155, text=("Particles: " + str(N)), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'))
+c.create_text(bound_x*mashtab+10,bound_y*mashtab-15, text=("Particles: " + str(N)), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'))
+c.create_text(bound_x*mashtab+10,bound_y*mashtab-45, text=("Density: " + str(N/(bound_x*bound_y*10**20))[:5]+ ", n/angstrom^2"), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'))
 
 for i in range(frames):
     c.delete("del")
@@ -112,7 +118,8 @@ for i in range(frames):
     c.create_text(bound_x*mashtab+10,35,  text=("Temperature: " + str(current_t[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
     c.create_text(bound_x*mashtab+10,65,  text=("Kinetic Energy: " + str(cinetic_e[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
     c.create_text(bound_x*mashtab+10,95,  text=("Potential Energy: " + str(potential_e[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
-    c.create_text(bound_x*mashtab+10,125, text=("Mean squared displacement: " + str(sqared_displacment[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+    c.create_text(bound_x*mashtab+10,125,  text=("Total Energy: " + str(potential_e[i]+cinetic_e[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
+    c.create_text(bound_x*mashtab+10,155, text=("Mean squared displacement: " + str(sqared_displacment[i])), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'), tags="del")
 
     c.create_line(0,bound_y*mashtab+25,(int(i/(frames/1000))/1000)*(bound_x*mashtab+500),bound_y*mashtab+25,width=10, fill="#6BAABF", tags="del")
 

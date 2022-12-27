@@ -38,10 +38,8 @@ molecular_dinamics::~molecular_dinamics()
 void molecular_dinamics::set_temperature(double temperatur)
 {
     Temperature = temperatur;
-    const double K_b = 1.38 * pow(10, -23);
     // Расчет средней скорости молекулы.
-    const double average_velosity = sqrt(3 * K_b * Temperature / mol.mass);
-
+    const double average_velosity = sqrt(2 * K_b * Temperature / mol.mass);
     std::random_device rd;
     std::mt19937 gen{rd()};
     std::normal_distribution<double> normal_dist{average_velosity, average_velosity / 5}; // Нормальное распределение
@@ -57,7 +55,7 @@ void molecular_dinamics::set_temperature(double temperatur)
     }
 }
 
-void molecular_dinamics::simulate(int steps, double delta_t, std::string filename, int frame_rate)
+void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std::string filename)
 {
     File.open(filename);
     number_of_steps = steps;
@@ -70,6 +68,14 @@ void molecular_dinamics::simulate(int steps, double delta_t, std::string filenam
     // Основной цикл моделирования.
     for (int step = 0; step < steps; step++)
     {
+        if (step % 500 == 0)
+        {
+        double target_T = 50;
+        double lyamda = std::sqrt(target_T / Temperature);
+        for (int i = 0; i < Number_of_particles; i++)
+            particles[i].velosity = lyamda*particles[i].velosity;
+        }
+
         // Индикатор выполнения программы (progress bar)
         if (step % (steps / 100) == 0)
             std::cout << "-" << std::flush;
@@ -84,7 +90,6 @@ void molecular_dinamics::simulate(int steps, double delta_t, std::string filenam
             // Зануление ускорений частицы.
             reset_acceleration(i);
         }
-
         // Второй и третий шаг интегратора.
         // 2.Расчет сил, действующих на частицы из потенциала Леннарда-Джонса.
         // 3.Расчет скорости частиц.
@@ -96,7 +101,7 @@ void molecular_dinamics::simulate(int steps, double delta_t, std::string filenam
             // Метод принимает номер двух частиц.
             // Рассчитывает потенциал Леннарда-Джонса и силы, действующие на частицы. Применяет их к обоим частицам.
 
-            //3.Расчет скорости частиц.
+            // 3.Расчет скорости частиц.
             particles[i].velosity = particles[i].velosity + ((particles[i].acceleration + previous_step_acceleration[i]) / 2) * delta_t;
             // Расчет наблюдаемых: отклонение частицы от начального положения.
             displacement[i] = displacement[i] + particles[i].velosity * delta_t;
@@ -122,12 +127,13 @@ void molecular_dinamics::simulate(int steps, double delta_t, std::string filenam
                 write_mol_info(i);
             }
             // Расчет температуры и вывод наблюдаемых в файл.
-            Temperature = (Kin_Energy * 2) / (3 * K_b * Number_of_particles);
+            Temperature = (Kin_Energy) / (K_b * Number_of_particles);
+
             write_observables(step);
         }
     }
 
-    //Метод рассчитывает кореляционную функцию и выводит её в файл.
+    // Метод рассчитывает кореляционную функцию и выводит её в файл.
     write_correlation_data();
 
     File.close();

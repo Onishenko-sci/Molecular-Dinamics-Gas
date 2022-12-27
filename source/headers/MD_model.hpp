@@ -62,7 +62,7 @@ private:
 public:
     molecular_dinamics(molecule& molecul, int number_of_particles, int bound_x = 100,int bound_y = 100);
     void set_temperature(double temperatur);
-    void simulate(int steps,double delta_t, std::string filename = "../render/md_render.txt", int frame_rate = 50);
+    void simulate(int steps,double delta_t,int frame_rate = 50, std::string filename = "../render/md_render.txt" );
     ~molecular_dinamics();
 
 };

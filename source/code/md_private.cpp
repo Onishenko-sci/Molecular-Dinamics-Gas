@@ -14,8 +14,8 @@ void molecular_dinamics::set_start_position()
 {
     // Генератор псевдослучайных величин. Равноменое распределение.
     std::random_device rd;
-    std::uniform_real_distribution<double> random_x(0.0, Bound_x);
-    std::uniform_real_distribution<double> random_y(0.0, Bound_y);
+    std::uniform_real_distribution<double> random_x(0.0, Bound_x - mol.interaction_radius);
+    std::uniform_real_distribution<double> random_y(0.0, Bound_y - mol.interaction_radius);
 
     // Метод генерирует случайное положение для частицы, и проверяет его. Если все остальные частицы находятся
     // находится достаточно далеко (т.е. дальше радиуса взаимодействия), случайное положение принимается.
@@ -31,7 +31,7 @@ void molecular_dinamics::set_start_position()
             random_position.y = random_y(rd);
             for (int j = 0; j < i; j++)
             {
-                if ((particles[j].position - random_position).abs() < mol.interaction_radius)
+                if ((particles[j].position - random_position).abs() <= mol.radius*1.5)
                     far_enough = false;
             }
             if (far_enough)
@@ -40,6 +40,7 @@ void molecular_dinamics::set_start_position()
         start_posistions[i] = particles[i].position;
         displacement[i] = start_posistions[i];
     }
+        std::cout << "Molecules positioned" << std::endl;
 }
 
 Vector2D molecular_dinamics::radius_vector(int &i, int &j) const
