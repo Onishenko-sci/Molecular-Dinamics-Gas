@@ -25,6 +25,8 @@ molecular_dinamics::molecular_dinamics(molecule &molecul, int number_of_particle
 
     // Метод, распределяющий атомы на участке (подробное описание внутри функции)
     set_start_position();
+
+    std::cout << "Density is " << double(Number_of_particles) / (bound_x * bound_y) << std::endl;
 }
 
 molecular_dinamics::~molecular_dinamics()
@@ -38,21 +40,26 @@ molecular_dinamics::~molecular_dinamics()
 void molecular_dinamics::set_temperature(double temperatur)
 {
     Temperature = temperatur;
+    Target_temperature = temperatur;
     // Расчет средней скорости молекулы.
-    const double average_velosity = sqrt(2 * K_b * Temperature / mol.mass);
+    const double average_velosity = sqrt(2 * K_b * Target_temperature / mol.mass);
     std::random_device rd;
     std::mt19937 gen{rd()};
-    std::normal_distribution<double> normal_dist{average_velosity, average_velosity / 5}; // Нормальное распределение
-    std::uniform_real_distribution<double> random(-1.0, 1.0);                             // Равномерное распределение
+    std::normal_distribution<double> normal_dist{average_velosity, average_velosity / 10}; // Нормальное распределение
+    std::uniform_real_distribution<double> random(-1.0, 1.0);                              // Равномерное распределение
 
     // Метод для каждой частицы выбирает направление вектора скорости.
     // Затем устанавливает абсолютное значение вектора скорости, полученное из нормального распределения.
-    for (int i = 0; i < Number_of_particles; i++)
+    for (int i = 0; i < Number_of_particles / 2 + 1; i++)
     {
         particles[i].velosity.x = random(rd);
         particles[i].velosity.y = random(rd);
         particles[i].velosity.abs(normal_dist(gen));
+
+        particles[Number_of_particles - 1 - i].velosity = -1 * particles[i].velosity;
     }
+    if (Number_of_particles % 2 == 1)
+        particles[Number_of_particles / 2].velosity.abs(0);
 }
 
 void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std::string filename)
@@ -60,6 +67,7 @@ void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std
     File.open(filename);
     number_of_steps = steps;
     time_step = delta_t;
+    double lyamda = 1;
 
     // Метод записывает в файл заголовок с параметрами модели.
     // Частота сохранения кадров передаётся напрямую, т.к. не схраняется в классе.
@@ -68,13 +76,6 @@ void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std
     // Основной цикл моделирования.
     for (int step = 0; step < steps; step++)
     {
-        if (step % 500 == 0)
-        {
-        double target_T = 50;
-        double lyamda = std::sqrt(target_T / Temperature);
-        for (int i = 0; i < Number_of_particles; i++)
-            particles[i].velosity = lyamda*particles[i].velosity;
-        }
 
         // Индикатор выполнения программы (progress bar)
         if (step % (steps / 100) == 0)
@@ -82,6 +83,7 @@ void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std
 
         // Первый шаг интегратора.
         // 1.Вычисление координаты частицы, проверка граничных условий и обнуление сил/ускорений.
+        Kin_Energy = 0;
         for (int i = 0; i < Number_of_particles; i++)
         {
             particles[i].position = particles[i].position + particles[i].velosity * delta_t + (particles[i].acceleration * pow(delta_t, 2)) / 2;
@@ -89,7 +91,13 @@ void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std
             boundaries_check(i);
             // Зануление ускорений частицы.
             reset_acceleration(i);
+            Kin_Energy += mol.mass * pow(particles[i].velosity.abs(), 2) / 2;
         }
+
+        // Macштабирование скоростей
+        Temperature = (Kin_Energy) / (K_b * Number_of_particles);
+        lyamda = std::sqrt(Target_temperature / Temperature);
+
         // Второй и третий шаг интегратора.
         // 2.Расчет сил, действующих на частицы из потенциала Леннарда-Джонса.
         // 3.Расчет скорости частиц.
@@ -102,9 +110,10 @@ void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std
             // Рассчитывает потенциал Леннарда-Джонса и силы, действующие на частицы. Применяет их к обоим частицам.
 
             // 3.Расчет скорости частиц.
-            particles[i].velosity = particles[i].velosity + ((particles[i].acceleration + previous_step_acceleration[i]) / 2) * delta_t;
+            Vector2D Half_step_acceleration = ((particles[i].acceleration + previous_step_acceleration[i]) / 2) * delta_t;
+            particles[i].velosity = lyamda * particles[i].velosity + Half_step_acceleration;
             // Расчет наблюдаемых: отклонение частицы от начального положения.
-            displacement[i] = displacement[i] + particles[i].velosity * delta_t;
+            displacement[i] = displacement[i] + particles[i].velosity * delta_t + Half_step_acceleration * delta_t / 2;
         }
 
         // Метод учитывает кадр при постройке гистрограммы количества частиц от расстояния между ними
@@ -114,13 +123,11 @@ void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std
         // Расчет наблюдаемых и вывод кадра в файл.
         if (step % frame_rate == 0)
         {
-            Kin_Energy = 0;
             Potential = 0;
             Square_displacment = 0;
             for (int i = 0; i < Number_of_particles; i++)
             {
                 // Расчет наблюдаемых.
-                Kin_Energy += mol.mass * pow(particles[i].velosity.abs(), 2) / 2;
                 Potential += particles[i].potential;
                 Square_displacment += pow((displacement[i] - start_posistions[i]).abs(), 2);
                 // Вывод информации о частице в файл.
@@ -128,7 +135,6 @@ void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std
             }
             // Расчет температуры и вывод наблюдаемых в файл.
             Temperature = (Kin_Energy) / (K_b * Number_of_particles);
-
             write_observables(step);
         }
     }

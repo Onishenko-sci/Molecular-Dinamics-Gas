@@ -2,9 +2,9 @@
 
 void Vector2D::abs(double len)
 {
-    double angle = this->fi();
-    x = len*cos(angle);
-    y = len*sin(angle);
+    double mnoj = len/abs();
+    x = x*mnoj;
+    y = y*mnoj;
 }
 
 Vector2D::Vector2D(double x_in, double y_in)

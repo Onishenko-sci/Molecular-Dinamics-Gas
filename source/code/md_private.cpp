@@ -18,7 +18,7 @@ void molecular_dinamics::set_start_position()
     std::uniform_real_distribution<double> random_y(0.0, Bound_y - mol.interaction_radius);
 
     // Метод генерирует случайное положение для частицы, и проверяет его. Если все остальные частицы находятся
-    // находится достаточно далеко (т.е. дальше радиуса взаимодействия), случайное положение принимается.
+    // находится достаточно далеко (т.е. дальше радиуса частицы*1.05), случайное положение принимается.
     // Если новая частица находится слишком близко к другой частице, выбирается новое случайное пложение.
     // Так происходит пока у всех частиц будет ненулевая координата.
     Vector2D random_position;
@@ -31,7 +31,7 @@ void molecular_dinamics::set_start_position()
             random_position.y = random_y(rd);
             for (int j = 0; j < i; j++)
             {
-                if ((particles[j].position - random_position).abs() <= mol.radius*1.5)
+                if ((particles[j].position - random_position).abs() <= mol.radius * 1.05)
                     far_enough = false;
             }
             if (far_enough)
@@ -40,7 +40,7 @@ void molecular_dinamics::set_start_position()
         start_posistions[i] = particles[i].position;
         displacement[i] = start_posistions[i];
     }
-        std::cout << "Molecules positioned" << std::endl;
+    std::cout << "Molecules positioned" << std::endl;
 }
 
 Vector2D molecular_dinamics::radius_vector(int &i, int &j) const
@@ -87,7 +87,8 @@ void molecular_dinamics::LJ_interact(int &i, int &j)
     // Расчет констант
     static const double e4sig6 = 4 * mol.pit_debt * pow(mol.radius, 6);
     static const double e4sig12 = 4 * mol.pit_debt * pow(mol.radius, 12);
-    static const double shift = (e4sig12 / pow(mol.interaction_radius, 12)) - (e4sig6 / pow(mol.interaction_radius, 6));
+   // static const double shift = (e4sig12 / pow(mol.interaction_radius, 12)) - (e4sig6 / pow(mol.interaction_radius, 6));
+    static const double shift = 0;
 
     // Расчет радиус вектора между i-й частицой и ближайшей копией (из граничных условий) j-й частицы.
     Vector2D radius_vec = radius_vector(i, j);

@@ -5,6 +5,7 @@ import matplotlib.pyplot as figure
 from tkinter import *
 import csv
 import sys
+from scipy.optimize import curve_fit
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -75,7 +76,17 @@ traked = N-1 #Number of tracked atom
 tragectory_x = frame_x[traked,:]*mashtab
 tragectory_y = frame_y[traked,:]*mashtab
 
-plt.figure(figsize=(10,4), dpi=120)
+def sqr(x,a):
+    return a*x**2
+X = np.arange(0,len(sqared_displacment))*frame_rate
+X = X*delta_t*(10**9)
+Y = sqared_displacment/(radius*2)**2
+#[0:int(steps/(frame_rate*2))]
+
+args, covar = curve_fit(sqr,X,Y)
+Y_predicted = sqr(X,args[0])
+
+plt.figure(figsize=(11,5))
 plt.subplot(1,2,1)
 plt.title('Correlation function')
 plt.ylabel('Correlation function')
@@ -86,16 +97,27 @@ plt.plot(np.array([2*radius,2*radius])*(10**10),np.linspace(0,corl.max(),2),'g--
 plt.subplot(1,2,2)
 plt.title('Mean squared displacement')
 plt.ylabel('Mean squared displacement, meters')
-plt.xlabel('Steps')
-plt.plot(np.arange(0,sqared_displacment.__len__())*frame_rate,sqared_displacment[:] , "b-")
+plt.xlabel('time, ns')
+plt.plot(X,Y , "b.")
+plt.plot(X,Y_predicted , "r--")
 
 plt.show()
 
-plt.plot(np.arange(0,current_t.__len__()), current_t, 'b-')
+total_e = cinetic_e+potential_e
+
+plt.figure(figsize=(10,7), dpi=120)
+plt.subplot(2,1,1)
+plt.plot(np.arange(0,len(current_t)), current_t, 'b.')
+plt.subplot(2,1,2)
+plt.plot(np.arange(0,len(potential_e)), potential_e, 'b-')
+plt.plot(np.arange(0,len(cinetic_e)), cinetic_e, 'r-')
+plt.plot(np.arange(0,len(total_e)), total_e, 'g-')
 plt.show()
 
 scene_x = 5
 scene_y = 5
+density = (N)/(bound_x*bound_y)
+density = density*(0.34*10**(-9))**2
 
 root = Tk()
 c = Canvas(root,width=int(bound_x*mashtab+500),heigh=int(bound_y*mashtab+30), bg="#303030", highlightthickness=0) 
@@ -110,7 +132,7 @@ c.create_line(bound_x*mashtab+5,bound_y*mashtab+5,5,bound_y*mashtab+5,width=5,fi
 c.create_line(5,5,5,bound_y*mashtab+5,width=5,fill="#BDD4F1")
 c.create_line(5,5,bound_x*mashtab+5,5,width=5,fill="#BDD4F1")
 c.create_text(bound_x*mashtab+10,bound_y*mashtab-15, text=("Particles: " + str(N)), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'))
-c.create_text(bound_x*mashtab+10,bound_y*mashtab-45, text=("Density: " + str(N/(bound_x*bound_y*10**20))[:5]+ ", n/angstrom^2"), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'))
+c.create_text(bound_x*mashtab+10,bound_y*mashtab-45, text=("Density: " + str(density)[0:5]), fill="#BDD4F1", anchor="nw", font=('Helvetica 15 bold'))
 
 for i in range(frames):
     c.delete("del")

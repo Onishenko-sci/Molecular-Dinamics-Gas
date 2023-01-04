@@ -26,7 +26,7 @@ private:
     molecule mol;
     particle* particles;
     Vector2D *previous_step_acceleration;
-    double Number_of_particles;
+    int Number_of_particles;
     double Bound_x;
     double Bound_y;
 
@@ -43,6 +43,7 @@ private:
     void write_correlation_data();
 
     double Temperature;
+    double Target_temperature;
     double Potential;
     double Kin_Energy;
     double Square_displacment;
@@ -56,7 +57,7 @@ private:
     void save_in_correlation();
 
     std::ofstream File;
-    int number_of_steps;
+    unsigned int number_of_steps;
     double time_step;
 
 public:
