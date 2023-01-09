@@ -75,8 +75,6 @@ with open(filename, newline='\n') as f:
         i = i+1
 
 # Апроксимация квадратичного отклонения
-
-
 def sqr(x, a):
     return a*x**2
 
@@ -131,8 +129,8 @@ scene_x = 5
 scene_y = 5
 
 # Радиус частицы уменьшен в 2 раза для наглядности
-radius = radius/2
 density = (Number_of_particles*radius**2)/(bound_x*bound_y)
+radius = radius/2
 
 # Траектория отдельной частицы
 traked = 0  # Номер отслеживаемой частицы

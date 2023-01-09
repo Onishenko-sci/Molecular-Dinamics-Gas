@@ -50,16 +50,19 @@ void molecular_dinamics::set_temperature(double temperatur)
 
     // Метод для каждой частицы выбирает направление вектора скорости.
     // Затем устанавливает абсолютное значение вектора скорости, полученное из нормального распределения.
-    for (int i = 0; i < Number_of_particles / 2 + 1; i++)
+    Vector2D sum_velosity = null_vec;
+    for (int i = 0; i < Number_of_particles; i++)
     {
         particles[i].velosity.x = random(rd);
         particles[i].velosity.y = random(rd);
         particles[i].velosity.abs(normal_dist(gen));
-
-        particles[Number_of_particles - 1 - i].velosity = -1 * particles[i].velosity;
+        sum_velosity = sum_velosity + particles[i].velosity;
     }
-    if (Number_of_particles % 2 == 1)
-        particles[Number_of_particles / 2].velosity.abs(0);
+
+    sum_velosity = sum_velosity / Number_of_particles;
+    for (int i = 0; i < Number_of_particles; i++)
+        particles[i].velosity = particles[i].velosity - sum_velosity;
+    
 }
 
 void molecular_dinamics::simulate(int steps, double delta_t, int frame_rate, std::string filename)
